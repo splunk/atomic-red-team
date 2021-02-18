@@ -1,0 +1,14 @@
+attack_technique: T1069.003
+display_name: 'Permission Groups Discovery: Cloud Groups'
+atomic_tests:
+- name: List groups on AWS
+  description: |
+    Adversaries may attempt to find cloud groups and permission settings. The knowledge of cloud permission groups can help adversaries determine the particular roles of users and groups within an environment, as well as which users are associated with a particular group.
+  supported_platforms:
+  - linux
+  - macos
+  executor:
+    command: |
+      aws iam list-groups
+    name: sh
+    elevation_required: false
