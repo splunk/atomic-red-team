@@ -1,0 +1,13 @@
+attack_technique: T1087.004
+display_name: Account Discovery - Cloud Account
+atomic_tests:
+- name: List AWS IAM Users
+  description: |
+    Adversaries may attempt to get a listing of cloud accounts. Cloud accounts are those created and configured by an organization for use by users, remote support, services, or for administration of resources within a cloud service provider or SaaS application.
+  supported_platforms:
+  - linux
+  - macos 
+  executor:
+    command: |
+      aws iam list-users
+    name: sh
