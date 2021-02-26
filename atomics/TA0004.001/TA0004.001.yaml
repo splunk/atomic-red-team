@@ -19,6 +19,7 @@ atomic_tests:
       default: "591511147606"
   executor:
     command: |
+      echo "creating new user and group and add user to group"
       aws iam create-user --user-name #{username}
       aws iam create-group --group-name #{username}
       aws iam add-user-to-group --user-name #{username} --group-name #{username}

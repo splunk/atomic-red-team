@@ -1,0 +1,73 @@
+attack_technique: TA0004.002
+display_name: AWS Privillege Escalation 
+atomic_tests:
+- name: setup requirements
+  auto_generated_guid: 8822c3b0-d9f9-4daf-a043-49f460236122
+  description: |
+    Setting up a user, group, add user to group and create access keys
+  supported_platforms:
+  - macos
+  - linux
+  input_arguments:
+    username:
+      description: Username of the user to create
+      type: String
+      default: "AtomicRedTeam"
+    aws_account_id:
+      description: AWS ACCOUNT ID
+      type: String
+      default: "591511147606"
+    input_source_code:
+      description: Path to source of aws_secret_code
+      type: path
+      default: PathToAtomicsFolder/TA0004.002/src/aws_secret.sh
+  executor:
+    command: |
+      aws iam create-user --user-name #{username} 
+      aws iam create-group --group-name #{username}
+      aws iam add-user-to-group --user-name #{username} --group-name #{username}
+      aws iam create-access-key --user-name AtomicRedTeam > $PathToAtomicsFolder/TA0004.002/bin/aws_secret.txt
+      /Users/bpatel/Research/malware/github/atomic-red-team/atomics/TA0004.002/bin/aws_secret.sh
+
+    cleanup_command: |
+      access_key=`cat $PathToAtomicsFolder/TA0004.002/bin/aws_secret.txt| jq -r '.AccessKey.AccessKeyId'`
+      aws iam delete-access-key --access-key-id $access_key --user-name #{username}
+      aws iam remove-user-from-group --user-name #{username} --group-name #{username}
+      aws iam delete-group --group-name #{username}
+      aws iam delete-user --user-name #{username}
+    name: sh
+
+# - name: iam:SetDefaultPolicyVersion
+#   auto_generated_guid: 8822c3b0-d9f9-4daf-a043-49f460236122
+#   description: |
+#     When modifying a policy, AWS automatically creates a new policy version with the changes. Those changes can then be undone by reverting the policy to a previous version. Users with the iam:SetDefaultPolicyVersion are allowed to set which version of the policy is the default (active) version.
+#   supported_platforms:
+#   - macos
+#   - linux
+#   input_arguments:
+#     username:
+#       description: Username of the user to create
+#       type: String
+#       default: "AtomicRedTeam"
+#     aws_account_id:
+#       description: AWS ACCOUNT ID
+#       type: String
+#       default: "591511147606"
+#   executor:
+#     command: |
+      
+#       aws iam create-policy --policy-name Privesc2 --policy-document file://$PathToAtomicsFolder/TA0004.002/src/Privesc2.json
+#       aws iam create-policy --policy-name VulnerablePolicy --policy-document file://$PathToAtomicsFolder/TA0004.002/src/VulnerablePolicy.json
+#       aws iam attach-group-policy --policy-arn arn:aws:iam::#{aws_account_id}:policy/Privesc2 --group-name #{username}
+#       aws iam attach-group-policy --policy-arn arn:aws:iam::#{aws_account_id}:policy/VulnerablePolicy --group-name #{username}
+
+#     cleanup_command: |
+#       aws iam remove-user-from-group --user-name #{username} --group-name #{username}
+#       aws iam detach-group-policy --group-name #{username} --policy-arn arn:aws:iam::#{aws_account_id}:policy/Privesc2
+#       aws iam detach-group-policy --group-name #{username} --policy-arn arn:aws:iam::#{aws_account_id}:policy/VulnerablePolicy
+#       aws iam delete-user --user-name #{username}
+#       aws iam delete-group --group-name #{username}
+#       aws iam delete-policy --policy-arn arn:aws:iam::#{aws_account_id}:policy/Privesc2
+#       aws iam delete-policy --policy-arn arn:aws:iam::#{aws_account_id}:policy/VulnerablePolicy
+#     name: sh
+#     elevation_required: false
