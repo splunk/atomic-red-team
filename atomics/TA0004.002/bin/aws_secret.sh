@@ -1,7 +1,7 @@
 #! /bin/sh
-echo "Creating Profile2"
-access_key=`cat aws_secret.txt| jq -r '.AccessKey.AccessKeyId'`
-secret_key=`cat aws_secret.txt| jq -r '.AccessKey.SecretAccessKey'`
+echo "Creating Profile in ./aws/credenntials"
+access_key=`cat aws_secret.creds| jq -r '.AccessKey.AccessKeyId'`
+secret_key=`cat aws_secret.creds| jq -r '.AccessKey.SecretAccessKey'`
 line=`grep -n atomic_red_team_profile ~/.aws/credentials | cut -d : -f1 |bc` 
 access="$(($line+1))"
 secret="$(($line+2))"
