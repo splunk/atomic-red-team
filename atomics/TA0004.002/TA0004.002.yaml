@@ -30,10 +30,8 @@ atomic_tests:
       cd $PathToAtomicsFolder/TA0004.002/bin/
       ./aws_secret.sh
 
-    # cleanup_command: |
-    #   aws iam remove-user-from-group --user-name #{username} --group-name #{username}
-    #   aws iam delete-group --group-name #{username}
-    #   aws iam delete-user --user-name #{username}
+    cleanup_command: |
+      
     name: sh
 
 - name: iam:SetDefaultPolicyVersion
@@ -54,14 +52,15 @@ atomic_tests:
       default: "591511147606"
   executor:
     command: |
-      
+      aws iam create-policy --policy-name VulnerablePolicy --policy-document file://$PathToAtomicsFolder/TA0004.002/src/AdminPolicy.json
       aws iam create-policy --policy-name Privesc2 --policy-document file://$PathToAtomicsFolder/TA0004.002/src/Privesc2.json
-      aws iam create-policy --policy-name VulnerablePolicy --policy-document file://$PathToAtomicsFolder/TA0004.002/src/VulnerablePolicy.json
+      aws iam create-policy-version --policy-arn arn:aws:iam::#{aws_account_id}:policy/VulnerablePolicy --policy-document file://$PathToAtomicsFolder/TA0004.002/src/VulnerablePolicy.json --set-as-default
       aws iam attach-group-policy --policy-arn arn:aws:iam::#{aws_account_id}:policy/Privesc2 --group-name #{username}
       aws iam attach-group-policy --policy-arn arn:aws:iam::#{aws_account_id}:policy/VulnerablePolicy --group-name #{username}
 
     cleanup_command: |
       access_key=`cat $PathToAtomicsFolder/TA0004.002/bin/aws_secret.creds| jq -r '.AccessKey.AccessKeyId'`
+      aws iam delete-policy-version --policy-arn arn:aws:iam::#{aws_account_id}:policy/VulnerablePolicy --version-id v1
       aws iam delete-access-key --access-key-id $access_key --user-name #{username}
       aws iam remove-user-from-group --user-name #{username} --group-name #{username}
       aws iam detach-group-policy --group-name #{username} --policy-arn arn:aws:iam::#{aws_account_id}:policy/Privesc2
