@@ -1,4 +1,4 @@
-attack_technique: TA0004.005
+attack_technique: TA0004.006
 display_name: AWS Privillege Escalation 
 atomic_tests:
 - name: setup requirements
@@ -20,23 +20,23 @@ atomic_tests:
     input_source_code:
       description: Path to source of aws_secret_code
       type: path
-      default: PathToAtomicsFolder/TA0004.005/src/aws_secret.sh
+      default: PathToAtomicsFolder/TA0004.006/src/aws_secret.sh
   executor:
     command: |
       aws iam create-user --user-name #{username} 
       aws iam create-group --group-name #{username}
       aws iam add-user-to-group --user-name #{username} --group-name #{username}
-      aws iam create-access-key --user-name AtomicRedTeam > $PathToAtomicsFolder/TA0004.005/bin/aws_secret.creds
-      cd $PathToAtomicsFolder/TA0004.005/bin/
+      aws iam create-access-key --user-name AtomicRedTeam > $PathToAtomicsFolder/TA0004.006/bin/aws_secret.creds
+      cd $PathToAtomicsFolder/TA0004.006/bin/
       ./aws_secret.sh
     cleanup_command: |
       
     name: sh
 
-- name: iam:CreateLoginProfile
+- name: iam:UpdateLoginProfile
   auto_generated_guid: 8822c1b0-d9f9-4daf-a043-19f460226122
   description: |
-    Users with the iam:CreateLoginProfile on other users can set a console login password for those users if they don’t have one set yet. Potential Impact: This method would give an attacker the same level of permissions as any user they were able to create a login profile for, which could range from no privilege escalation to full administrator access to the account.
+    Users with the iam:UpdateLoginProfile on other users can change the console login password for those users. The target user currently has a console password configured. The attacker can issue the command to change the console login password for the target user.
   supported_platforms:
   - macos
   - linux
@@ -52,9 +52,11 @@ atomic_tests:
   executor:
     command: |
       aws iam create-login-profile --user-name #{username} --password L1uUXdok9pNO9JNCY3CpV --no-password-reset-required
+      sleep 20
+      aws iam update-login-profile --user-name #{username} --password NewPass-L1uUXdok9pNO9JNCY3CpV --no-password-reset-required
 
     cleanup_command: |
-      access_key=`cat $PathToAtomicsFolder/TA0004.005/bin/aws_secret.creds| jq -r '.AccessKey.AccessKeyId'`
+      access_key=`cat $PathToAtomicsFolder/TA0004.006/bin/aws_secret.creds| jq -r '.AccessKey.AccessKeyId'`
       aws iam delete-access-key --access-key-id $access_key --user-name #{username}
       aws iam delete-login-profile --user-name #{username}
       aws iam remove-user-from-group --user-name #{username} --group-name #{username}

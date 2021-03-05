@@ -69,5 +69,6 @@ atomic_tests:
       aws iam delete-group --group-name #{username}
       aws iam delete-policy --policy-arn arn:aws:iam::#{aws_account_id}:policy/Privesc2
       aws iam delete-policy --policy-arn arn:aws:iam::#{aws_account_id}:policy/VulnerablePolicy
+      rm $PathToAtomicsFolder/TA0004.006/bin/aws_secret.creds
     name: sh
     elevation_required: false
