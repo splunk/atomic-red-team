@@ -1,0 +1,11 @@
+{
+	"Version": "2012-10-17",
+    "Statement": [
+		{
+        	"Sid": "Privesc2",
+            "Effect": "Allow",
+            "Action": "iam:SetDefaultPolicyVersion",
+            "Resource": "arn:aws:iam::*:policy/*"
+		}
+ 	]
+}
