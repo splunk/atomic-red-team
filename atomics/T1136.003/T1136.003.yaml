@@ -7,11 +7,11 @@ atomic_tests:
   supported_platforms:
   - linux
   - macos
-  cloud_environment:
-  - AWS
+  cloud_provider:
+  - aws
   input_arguments:
     username:
-      description: Username of the user to create
+      description: Username of the IAM user to create in  AWS
       type: String
       default: "AtomicRedTeam_Victim"
   executor:
