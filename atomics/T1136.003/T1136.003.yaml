@@ -7,11 +7,13 @@ atomic_tests:
   supported_platforms:
   - linux
   - macos
+  cloud_environment:
+  - AWS
   input_arguments:
     username:
       description: Username of the user to create
       type: String
-      default: "Atomic_Red_Team"
+      default: "AtomicRedTeam_Victim"
   executor:
     command: |
       aws iam create-user --user-name #{username}
