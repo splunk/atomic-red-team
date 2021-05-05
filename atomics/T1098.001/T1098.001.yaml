@@ -1,5 +1,5 @@
 attack_technique: T1098.001
-display_name: Account Manipulation- Additional Cloud Credentials
+display_name: Account Manipulation - Additional Cloud Credentials
 atomic_tests:
 - name: Create AWS Access Key and Secret Key
   auto_generated_guid: 8822c3b0-d9f9-4daf-a043-491160a31122
@@ -15,6 +15,13 @@ atomic_tests:
       description: Username of the IAM user to create - Victim
       type: String
       default: "AtomicRedTeam_Victim"
+  dependencies:
+    - description: |
+        Check if the user exists before adding a user to the group
+      prereq_command: |
+        aws iam list-users | grep #{victim}
+      get_prereq_command: |
+        echo Please run atomic test T1136.003, before running this atomic
   executor:
     command: |
       aws iam create-access-key --user-name #{victim} > $PathToAtomicsFolder/T1098.001/bin/aws_secret.creds
